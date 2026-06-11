@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     log_level: str = "INFO"
 
-    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5433/onramp_stt"
+    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5434/onramp_stt"
     redis_url: str = "redis://localhost:6380/0"
 
     storage_backend: Literal["local", "s3"] = "local"

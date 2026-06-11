@@ -17,7 +17,7 @@ down_revision: str | Sequence[str] | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
-job_status = sa.Enum(
+job_status = postgresql.ENUM(
     "queued",
     "preprocessing",
     "transcribing",
@@ -27,8 +27,9 @@ job_status = sa.Enum(
     "failed",
     "cancelled",
     name="job_status",
+    create_type=False,
 )
-chunk_status = sa.Enum(
+chunk_status = postgresql.ENUM(
     "pending",
     "processing",
     "retry_wait",
@@ -36,6 +37,7 @@ chunk_status = sa.Enum(
     "failed",
     "cancelled",
     name="chunk_status",
+    create_type=False,
 )
 
 
