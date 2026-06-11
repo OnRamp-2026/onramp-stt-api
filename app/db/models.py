@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
@@ -24,7 +24,7 @@ from app.db.base import Base
 
 
 def utcnow() -> datetime:
-    return datetime.now().astimezone()
+    return datetime.now(UTC)
 
 
 class JobStatus(StrEnum):
