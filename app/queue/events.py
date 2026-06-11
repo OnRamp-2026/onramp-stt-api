@@ -20,9 +20,9 @@ class TranscriptionRequested(BaseModel):
     tenant_id: str = Field(min_length=1, max_length=128)
     source_object_key: str = Field(min_length=1)
     source_etag: str | None = None
-    source_filename: str = Field(min_length=1, max_length=512)
-    source_content_type: str = Field(min_length=1, max_length=128)
-    source_size_bytes: int = Field(gt=0)
+    source_filename: str | None = Field(default=None, max_length=512)
+    source_content_type: str = Field(default="application/octet-stream", min_length=1, max_length=128)
+    source_size_bytes: int = Field(default=0, ge=0)
     requested_at: datetime | None = None
 
 
