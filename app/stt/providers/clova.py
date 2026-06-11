@@ -24,10 +24,13 @@ class ClovaSpeechProvider:
 
     async def transcribe(self, audio_path: Path) -> ProviderResult:
         params = self._build_params()
-        files = {
-            "media": (audio_path.name, audio_path.read_bytes(), "audio/wav"),
-            "params": (None, json.dumps(params, ensure_ascii=False), "application/json"),
-        }
+        files: list[tuple[str, tuple[str | None, bytes, str]]] = [
+            ("media", (audio_path.name, audio_path.read_bytes(), "audio/wav")),
+            (
+                "params",
+                (None, json.dumps(params, ensure_ascii=False).encode(), "application/json"),
+            ),
+        ]
         headers = {"X-CLOVASPEECH-API-KEY": self.settings.naver_clova_speech_secret_key}
         url = f"{self.settings.naver_clova_speech_invoke_url.rstrip('/')}/recognizer/upload"
         owns_client = self.client is None

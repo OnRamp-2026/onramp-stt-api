@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import os
 import socket
+from typing import Any, cast
 
 import structlog
 
@@ -40,12 +41,15 @@ async def run() -> None:
     )
 
     while True:
-        messages = await redis.xreadgroup(
-            CLOVA_WORKER_GROUP,
-            consumer,
-            {STT_CHUNK_STREAM: ">"},
-            count=1,
-            block=settings.redis_stream_block_ms,
+        messages = cast(
+            list[tuple[str, list[tuple[str, dict[str, str]]]]],
+            await cast(Any, redis).xreadgroup(
+                CLOVA_WORKER_GROUP,
+                consumer,
+                {STT_CHUNK_STREAM: ">"},
+                count=1,
+                block=settings.redis_stream_block_ms,
+            ),
         )
         for _, entries in messages:
             for message_id, fields in entries:

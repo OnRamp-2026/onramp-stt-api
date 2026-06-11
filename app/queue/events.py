@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any, Literal, cast
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -46,6 +46,6 @@ def decode_envelope(fields: dict[str, str]) -> StreamEnvelope:
     return StreamEnvelope(
         event_id=fields["event_id"],
         event_type=fields["event_type"],
-        schema_version=fields.get("schema_version", "1.0"),
+        schema_version=cast(Literal["1.0"], fields.get("schema_version", "1.0")),
         payload=json.loads(fields["payload"]),
     )

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any, cast
 
 import structlog
 from redis.asyncio import Redis
@@ -48,7 +49,10 @@ class OutboxPublisher:
                     payload=row.payload_json,
                 )
                 try:
-                    await self.redis.xadd(row.stream_name, encode_envelope(envelope))
+                    await self.redis.xadd(
+                        row.stream_name,
+                        cast(dict[Any, Any], encode_envelope(envelope)),
+                    )
                 except Exception as exc:
                     row.publish_attempts += 1
                     row.last_error = type(exc).__name__
