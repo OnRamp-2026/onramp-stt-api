@@ -42,6 +42,12 @@ class ProgressUpdated(BaseModel):
     progress_ratio: float = Field(ge=0, le=1)
 
 
+class TranscriptCompleted(BaseModel):
+    transcription_id: UUID
+    tenant_id: str
+    result_object_key: str
+
+
 def encode_envelope(envelope: StreamEnvelope) -> dict[str, str]:
     return {
         "event_id": envelope.event_id,

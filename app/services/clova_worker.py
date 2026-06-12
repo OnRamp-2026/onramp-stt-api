@@ -28,8 +28,10 @@ from app.queue.constants import (
     STT_CHUNK_STREAM,
     STT_DLQ_STREAM,
     STT_PROGRESS_STREAM,
+    STT_TRANSCRIPT_COMPLETED_STREAM,
+    TRANSCRIPT_COMPLETED_EVENT_TYPE,
 )
-from app.queue.events import ChunkRequested, ProgressUpdated, StreamEnvelope
+from app.queue.events import ChunkRequested, ProgressUpdated, StreamEnvelope, TranscriptCompleted
 from app.queue.inbox import is_processed, mark_processed
 from app.storage.base import ObjectStorage
 from app.stt.merger import merge_chunk_segments, render_plain_text
@@ -290,6 +292,21 @@ class ClovaChunkService:
         job.merged_segments_json = segment_payload
         job.status = JobStatus.transcript_completed
         job.completed_at = utcnow()
+
+        session.add(
+            EventOutbox(
+                id=f"evt_{uuid.uuid4().hex}",
+                aggregate_type="transcription",
+                aggregate_id=str(job.id),
+                event_type=TRANSCRIPT_COMPLETED_EVENT_TYPE,
+                stream_name=STT_TRANSCRIPT_COMPLETED_STREAM,
+                payload_json=TranscriptCompleted(
+                    transcription_id=job.id,
+                    tenant_id=job.tenant_id,
+                    result_object_key=result_key,
+                ).model_dump(mode="json"),
+            )
+        )
 
     def _record_progress(self, session: AsyncSession, job: TranscriptionJob, *, status_changed: bool) -> None:
         ratio = (job.completed_chunks / job.total_chunks) if job.total_chunks else 0.0
