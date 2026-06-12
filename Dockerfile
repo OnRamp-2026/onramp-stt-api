@@ -1,3 +1,5 @@
+FROM mwader/static-ffmpeg:7.0.2 AS ffmpeg
+
 FROM python:3.11-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -6,11 +8,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends ffmpeg ca-certificates \
-    && rm -rf /var/lib/apt/lists/* \
-    && addgroup --system onramp \
+COPY --from=ffmpeg /ffmpeg /usr/local/bin/ffmpeg
+COPY --from=ffmpeg /ffprobe /usr/local/bin/ffprobe
+
+RUN addgroup --system onramp \
     && adduser --system --ingroup onramp --home /app onramp
 
 COPY --chown=onramp:onramp pyproject.toml ./
