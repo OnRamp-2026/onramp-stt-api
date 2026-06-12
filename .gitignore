@@ -1,6 +1,7 @@
 .DS_Store
 .env
 .mypy_cache/
+.omc/
 .pytest_cache/
 .ruff_cache/
 .venv/
@@ -12,4 +13,3 @@ htmlcov/
 data/
 dist/
 build/
-

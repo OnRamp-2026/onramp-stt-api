@@ -10,15 +10,15 @@ test:
 	pytest tests
 
 lint:
-	ruff format --check app tests alembic
-	ruff check app tests alembic
+	ruff format --check app scripts tests alembic
+	ruff check app scripts tests alembic
 
 format:
-	ruff check --fix app tests alembic
-	ruff format app tests alembic
+	ruff check --fix app scripts tests alembic
+	ruff format app scripts tests alembic
 
 typecheck:
-	mypy app
+	mypy app scripts
 
 migrate:
 	alembic upgrade head
@@ -34,4 +34,3 @@ down:
 
 logs:
 	docker compose --profile pipeline logs -f
-
