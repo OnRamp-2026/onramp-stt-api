@@ -22,8 +22,14 @@ from app.db.models import (
     TranscriptionJob,
     utcnow,
 )
-from app.queue.constants import CLOVA_WORKER_GROUP, STT_CHUNK_STREAM, STT_DLQ_STREAM
-from app.queue.events import ChunkRequested, StreamEnvelope
+from app.queue.constants import (
+    CLOVA_WORKER_GROUP,
+    PROGRESS_EVENT_TYPE,
+    STT_CHUNK_STREAM,
+    STT_DLQ_STREAM,
+    STT_PROGRESS_STREAM,
+)
+from app.queue.events import ChunkRequested, ProgressUpdated, StreamEnvelope
 from app.queue.inbox import is_processed, mark_processed
 from app.storage.base import ObjectStorage
 from app.stt.merger import merge_chunk_segments, render_plain_text
@@ -150,10 +156,13 @@ class ClovaChunkService:
             chunk.lease_owner = None
             chunk.lease_expires_at = None
             job.completed_chunks += 1
+            status_changed = False
             if job.completed_chunks == job.total_chunks:
                 job.status = JobStatus.merging
                 await session.flush()
                 await self._merge_transcription(session, job)
+                status_changed = True
+            self._record_progress(session, job, status_changed=status_changed)
             mark_processed(session, CLOVA_WORKER_GROUP, event_id, str(chunk.id))
 
         await logger.ainfo(
@@ -229,6 +238,7 @@ class ClovaChunkService:
                         },
                     )
                 )
+                self._record_progress(session, job, status_changed=True)
             mark_processed(session, CLOVA_WORKER_GROUP, envelope.event_id, str(chunk.id))
 
     async def _merge_transcription(
@@ -280,6 +290,60 @@ class ClovaChunkService:
         job.merged_segments_json = segment_payload
         job.status = JobStatus.transcript_completed
         job.completed_at = utcnow()
+
+    def _record_progress(self, session: AsyncSession, job: TranscriptionJob, *, status_changed: bool) -> None:
+        ratio = (job.completed_chunks / job.total_chunks) if job.total_chunks else 0.0
+        now = utcnow()
+        if not should_emit_progress(
+            status_changed=status_changed,
+            previous_ratio=job.last_progress_ratio,
+            current_ratio=ratio,
+            last_emitted_at=job.last_progress_at,
+            now=now,
+        ):
+            return
+
+        job.last_progress_ratio = ratio
+        job.last_progress_at = now
+        payload = ProgressUpdated(
+            transcription_id=job.id,
+            tenant_id=job.tenant_id,
+            status=job.status.value,
+            completed_chunks=job.completed_chunks,
+            total_chunks=job.total_chunks,
+            progress_ratio=ratio,
+        )
+        session.add(
+            EventOutbox(
+                id=f"evt_{uuid.uuid4().hex}",
+                aggregate_type="transcription",
+                aggregate_id=str(job.id),
+                event_type=PROGRESS_EVENT_TYPE,
+                stream_name=STT_PROGRESS_STREAM,
+                payload_json=payload.model_dump(mode="json"),
+            )
+        )
+
+
+PROGRESS_MIN_RATIO_DELTA = 0.05
+PROGRESS_MIN_INTERVAL_SEC = 10.0
+
+
+def should_emit_progress(
+    *,
+    status_changed: bool,
+    previous_ratio: float,
+    current_ratio: float,
+    last_emitted_at: datetime | None,
+    now: datetime,
+) -> bool:
+    if status_changed:
+        return True
+    if current_ratio - previous_ratio >= PROGRESS_MIN_RATIO_DELTA:
+        return True
+    if last_emitted_at is None:
+        return True
+    return (now - last_emitted_at).total_seconds() >= PROGRESS_MIN_INTERVAL_SEC
 
 
 def can_claim_chunk(

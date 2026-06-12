@@ -33,6 +33,15 @@ class ChunkRequested(BaseModel):
     chunk_object_key: str
 
 
+class ProgressUpdated(BaseModel):
+    transcription_id: UUID
+    tenant_id: str
+    status: str
+    completed_chunks: int = Field(ge=0)
+    total_chunks: int = Field(ge=0)
+    progress_ratio: float = Field(ge=0, le=1)
+
+
 def encode_envelope(envelope: StreamEnvelope) -> dict[str, str]:
     return {
         "event_id": envelope.event_id,

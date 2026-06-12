@@ -4,6 +4,8 @@ STT_PROGRESS_STREAM = "onramp:stt:progress:v1"
 STT_COMMAND_STREAM = "onramp:stt:commands:v1"
 STT_DLQ_STREAM = "onramp:stt:dlq:v1"
 
+PROGRESS_EVENT_TYPE = "transcription.progress.updated"
+
 ORCHESTRATOR_GROUP = "stt-orchestrators"
 CLOVA_WORKER_GROUP = "clova-workers"
 COMMAND_HANDLER_GROUP = "stt-command-handlers"
