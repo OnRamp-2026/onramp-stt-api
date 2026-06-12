@@ -7,6 +7,7 @@ from app.services.job_state import ensure_chunk_transition, ensure_job_transitio
 def test_job_status_allows_normal_pipeline_transition() -> None:
     ensure_job_transition(JobStatus.queued, JobStatus.preprocessing)
     ensure_job_transition(JobStatus.preprocessing, JobStatus.transcribing)
+    ensure_job_transition(JobStatus.merging, JobStatus.transcript_completed)
 
 
 def test_job_status_rejects_skipping_preprocessing() -> None:

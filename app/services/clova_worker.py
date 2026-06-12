@@ -26,6 +26,7 @@ from app.queue.constants import CLOVA_WORKER_GROUP, STT_CHUNK_STREAM, STT_DLQ_ST
 from app.queue.events import ChunkRequested, StreamEnvelope
 from app.queue.inbox import is_processed, mark_processed
 from app.storage.base import ObjectStorage
+from app.stt.merger import merge_chunk_segments, render_plain_text
 from app.stt.providers.base import ProviderResult, STTProvider
 
 logger = structlog.get_logger(__name__)
@@ -151,6 +152,8 @@ class ClovaChunkService:
             job.completed_chunks += 1
             if job.completed_chunks == job.total_chunks:
                 job.status = JobStatus.merging
+                await session.flush()
+                await self._merge_transcription(session, job)
             mark_processed(session, CLOVA_WORKER_GROUP, event_id, str(chunk.id))
 
         await logger.ainfo(
@@ -227,6 +230,56 @@ class ClovaChunkService:
                     )
                 )
             mark_processed(session, CLOVA_WORKER_GROUP, envelope.event_id, str(chunk.id))
+
+    async def _merge_transcription(
+        self,
+        session: AsyncSession,
+        job: TranscriptionJob,
+    ) -> None:
+        chunks = list(
+            await session.scalars(
+                select(TranscriptionChunk)
+                .where(TranscriptionChunk.transcription_id == job.id)
+                .order_by(TranscriptionChunk.chunk_index)
+            )
+        )
+        if len(chunks) != job.total_chunks or any(chunk.status != ChunkStatus.completed for chunk in chunks):
+            raise RuntimeError("Cannot merge a transcription with incomplete chunks.")
+
+        merged_segments = merge_chunk_segments(
+            [
+                (
+                    chunk.source_mapping_json,
+                    chunk.normalized_segments_json or [],
+                )
+                for chunk in chunks
+            ]
+        )
+        merged_text = render_plain_text(merged_segments)
+        segment_payload = [asdict(segment) for segment in merged_segments]
+        payload = {
+            "schema_version": "1.0",
+            "transcription_id": str(job.id),
+            "tenant_id": job.tenant_id,
+            "provider": job.provider,
+            "audio_duration_sec": job.audio_duration_sec,
+            "text": merged_text,
+            "segments": segment_payload,
+        }
+        result_key = f"tenants/{job.tenant_id}/transcriptions/{job.id}/result/transcript.json"
+        with tempfile.TemporaryDirectory(prefix=f"onramp-merge-{job.id}-") as temp_dir:
+            result_path = Path(temp_dir) / "transcript.json"
+            result_path.write_text(
+                json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
+                encoding="utf-8",
+            )
+            await self.storage.upload(result_path, result_key, content_type="application/json")
+
+        job.result_object_key = result_key
+        job.merged_text = merged_text
+        job.merged_segments_json = segment_payload
+        job.status = JobStatus.transcript_completed
+        job.completed_at = utcnow()
 
 
 def can_claim_chunk(
