@@ -39,7 +39,9 @@ class ProgressUpdated(BaseModel):
     status: str
     completed_chunks: int = Field(ge=0)
     total_chunks: int = Field(ge=0)
+    failed_chunks: int = Field(ge=0)
     progress_ratio: float = Field(ge=0, le=1)
+    occurred_at: datetime
 
 
 class TranscriptCompleted(BaseModel):
