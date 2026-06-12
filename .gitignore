@@ -13,3 +13,4 @@ htmlcov/
 data/
 dist/
 build/
+uv.lock
