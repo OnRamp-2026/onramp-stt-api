@@ -21,6 +21,18 @@ redis.call('EXPIRE', key, math.ceil(expires_at - now))
 return 1
 """
 
+RENEW_SCRIPT = """
+local key = KEYS[1]
+local lease_id = ARGV[1]
+local expires_at = tonumber(ARGV[2])
+if redis.call('ZSCORE', key, lease_id) == false then
+  return 0
+end
+redis.call('ZADD', key, expires_at, lease_id)
+redis.call('EXPIRE', key, math.ceil(expires_at - tonumber(ARGV[3])))
+return 1
+"""
+
 
 class RedisLeaseSemaphore:
     def __init__(self, redis: Redis, key: str, *, limit: int, lease_seconds: int) -> None:
@@ -45,3 +57,15 @@ class RedisLeaseSemaphore:
 
     async def release(self, lease_id: str) -> None:
         await self.redis.zrem(self.key, lease_id)
+
+    async def renew(self, lease_id: str) -> bool:
+        now = time.time()
+        renewed = await self.redis.eval(
+            RENEW_SCRIPT,
+            1,
+            self.key,
+            lease_id,
+            now + self.lease_seconds,
+            now,
+        )
+        return bool(renewed == 1)

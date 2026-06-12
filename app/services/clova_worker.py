@@ -52,23 +52,33 @@ class ClovaChunkService:
 
         with tempfile.TemporaryDirectory(prefix=f"onramp-clova-{request.transcription_id}-") as temp_dir:
             audio_path = Path(temp_dir) / f"chunk_{request.chunk_index:04d}.wav"
-            await self.storage.download(request.chunk_object_key, audio_path)
             try:
+                await self.storage.download(request.chunk_object_key, audio_path)
                 result = await self.provider.transcribe(audio_path)
+                raw_path = Path(temp_dir) / "raw.json"
+                raw_path.write_text(
+                    json.dumps(result.raw_response, ensure_ascii=False, separators=(",", ":")),
+                    encoding="utf-8",
+                )
+                raw_key = (
+                    f"tenants/{request.tenant_id}/transcriptions/{request.transcription_id}"
+                    f"/provider-raw/{request.chunk_index:04d}.json"
+                )
+                await self.storage.upload(raw_path, raw_key, content_type="application/json")
             except ProviderError as exc:
                 await self._record_failure(request, envelope, exc)
                 return
+            except Exception as exc:
+                await self._record_failure(
+                    request,
+                    envelope,
+                    ProviderError(
+                        f"Chunk processing failed before provider completion: {type(exc).__name__}",
+                        retryable=True,
+                    ),
+                )
+                return
 
-            raw_path = Path(temp_dir) / "raw.json"
-            raw_path.write_text(
-                json.dumps(result.raw_response, ensure_ascii=False, separators=(",", ":")),
-                encoding="utf-8",
-            )
-            raw_key = (
-                f"tenants/{request.tenant_id}/transcriptions/{request.transcription_id}"
-                f"/provider-raw/{request.chunk_index:04d}.json"
-            )
-            await self.storage.upload(raw_path, raw_key, content_type="application/json")
             await self._record_success(request, envelope.event_id, raw_key, result)
 
     async def _claim(self, request: ChunkRequested, event_id: str) -> TranscriptionChunk | None:

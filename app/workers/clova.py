@@ -21,6 +21,18 @@ from app.stt.providers.clova import ClovaSpeechProvider
 logger = structlog.get_logger(__name__)
 
 
+async def renew_lease(
+    semaphore: RedisLeaseSemaphore,
+    lease_id: str,
+    interval_seconds: float,
+) -> None:
+    while True:
+        await asyncio.sleep(interval_seconds)
+        if not await semaphore.renew(lease_id):
+            await logger.awarning("clova_semaphore_lease_lost", lease_id=lease_id)
+            return
+
+
 async def run() -> None:
     settings = get_settings()
     configure_logging(settings.log_level)
@@ -59,12 +71,21 @@ async def run() -> None:
                     if lease_id is not None:
                         break
                     await asyncio.sleep(1)
+                heartbeat = asyncio.create_task(
+                    renew_lease(
+                        semaphore,
+                        lease_id,
+                        max(1.0, settings.clova_semaphore_lease_sec / 3),
+                    )
+                )
                 try:
                     await service.process(decode_envelope(fields))
                 except Exception:
                     await logger.aexception("clova_event_failed", message_id=message_id)
                     continue
                 finally:
+                    heartbeat.cancel()
+                    await asyncio.gather(heartbeat, return_exceptions=True)
                     await semaphore.release(lease_id)
                 await redis.xack(STT_CHUNK_STREAM, CLOVA_WORKER_GROUP, message_id)
 
