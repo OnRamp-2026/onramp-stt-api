@@ -36,6 +36,12 @@ class Settings(BaseSettings):
 
     naver_clova_speech_invoke_url: str = ""
     naver_clova_speech_secret_key: str = ""
+    openai_api_key: str = ""
+    stt_correction_enable_llm: bool = True
+    stt_correction_model: str = "gpt-4.1-mini"
+    stt_correction_dictionary_version: str = "2026-06-11"
+    stt_correction_min_response_ratio: float = Field(default=0.6, gt=0, le=1)
+    stt_correction_glossary_max_items: int = Field(default=30, ge=1, le=100)
     clova_request_timeout_sec: float = Field(default=180, gt=0)
     clova_max_concurrent_jobs: int = Field(default=2, ge=1)
     clova_max_retry_count: int = Field(default=3, ge=0)

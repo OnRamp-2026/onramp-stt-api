@@ -14,9 +14,14 @@ Redis 전사 요청
   → Redis 청크 요청
   → CLOVA Speech ko-KR 전사
   → 청크별 결과 저장
+  → timestamp 기준 원본 transcript 병합
+  → 용어 사전 1차 교정
+  → OpenAI 기반 제한적 2차 교정
+  → 교정 결과 저장
+  → 최종 완료 이벤트 발행
 ```
 
-청크 병합, 용어 사전 교정, 완료 이벤트, `onramp-api` 보고서 연동은 후속 범위입니다.
+`onramp-api` 보고서 연동과 사전 운영 자동화는 후속 범위입니다.
 
 ## 구성
 
@@ -38,11 +43,12 @@ source .venv/bin/activate
 uv pip install -e ".[dev,s3]"
 ```
 
-`.env`에 CLOVA 정보를 입력합니다.
+`.env`에 CLOVA와 교정 정보를 입력합니다.
 
 ```dotenv
 NAVER_CLOVA_SPEECH_INVOKE_URL=https://clovaspeech-gw.ncloud.com/external/v1/<domain-id>
 NAVER_CLOVA_SPEECH_SECRET_KEY=<secret-key>
+OPENAI_API_KEY=<openai-api-key>
 ```
 
 `INVOKE_URL`은 `/recognizer/upload`를 제외한 도메인 URL입니다.
@@ -110,6 +116,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8001
 python -m app.workers.outbox_publisher
 python -m app.workers.orchestrator
 python -m app.workers.clova
+python -m app.workers.correction
 ```
 
 worker 역할:
@@ -117,6 +124,7 @@ worker 역할:
 - `outbox_publisher`: PostgreSQL outbox를 Redis Stream에 발행
 - `orchestrator`: 원본 다운로드, WAV 변환, VAD, chunk job 생성
 - `clova`: CLOVA 호출, retry/backoff, 청크 결과 저장
+- `correction`: 병합 transcript 교정, audit log 저장, 최종 완료 event 발행
 
 ## 주요 환경변수
 

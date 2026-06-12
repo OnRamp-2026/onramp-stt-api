@@ -1,0 +1,1312 @@
+{
+  "version": "2026-06-11",
+  "description": "Local test dictionary for incident meeting STT correction. The schema is designed to be portable to an RDB term table.",
+  "terms": [
+    {
+      "term_id": "K8S_001",
+      "canonical": "Kubernetes",
+      "category": "kubernetes",
+      "aliases": [
+        "k8s",
+        "K8s",
+        "케이 에잇 에스",
+        "쿠버네티스"
+      ],
+      "stt_variants": [
+        "쿠버 네티스",
+        "큐버네티스",
+        "쿠버네티스",
+        "쿠버 내티스",
+        "쿠버 네티즈",
+        "케이 에잇 에스"
+      ],
+      "description": "컨테이너 오케스트레이션 플랫폼",
+      "source": "manual",
+      "confidence": 0.95,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_002",
+      "canonical": "Pod",
+      "category": "kubernetes",
+      "aliases": [
+        "pod",
+        "파드"
+      ],
+      "stt_variants": [
+        "파드",
+        "팟",
+        "포드"
+      ],
+      "description": "Kubernetes에서 실행되는 최소 배포 단위",
+      "source": "manual",
+      "confidence": 0.94,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_003",
+      "canonical": "Deployment",
+      "category": "kubernetes",
+      "aliases": [
+        "deploy",
+        "디플로이먼트"
+      ],
+      "stt_variants": [
+        "디플로이먼트",
+        "디플로이 먼트",
+        "디플로이",
+        "디플로이먼트가"
+      ],
+      "description": "Kubernetes 워크로드 배포 리소스",
+      "source": "manual",
+      "confidence": 0.93,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_004",
+      "canonical": "StatefulSet",
+      "category": "kubernetes",
+      "aliases": [
+        "스테이트풀셋"
+      ],
+      "stt_variants": [
+        "스테이트 풀 셋",
+        "스테이트풀 셋",
+        "스테이트풀셋",
+        "스테이트 풀세트"
+      ],
+      "description": "상태가 있는 Kubernetes 워크로드 리소스",
+      "source": "manual",
+      "confidence": 0.93,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_005",
+      "canonical": "Namespace",
+      "category": "kubernetes",
+      "aliases": [
+        "네임스페이스"
+      ],
+      "stt_variants": [
+        "네임 스페이스",
+        "네임스페이스",
+        "네임 스페이스가"
+      ],
+      "description": "Kubernetes 리소스 논리 분리 단위",
+      "source": "manual",
+      "confidence": 0.93,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_006",
+      "canonical": "Ingress",
+      "category": "kubernetes",
+      "aliases": [
+        "인그레스"
+      ],
+      "stt_variants": [
+        "인그레스",
+        "잉그레스",
+        "인 그래스",
+        "잉 그래스"
+      ],
+      "description": "클러스터 외부 HTTP/HTTPS 트래픽 라우팅 리소스",
+      "source": "manual",
+      "confidence": 0.95,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_007",
+      "canonical": "Service",
+      "category": "kubernetes",
+      "aliases": [
+        "svc",
+        "서비스 리소스"
+      ],
+      "stt_variants": [
+        "서비스 리소스",
+        "서비스 오브젝트",
+        "에스브이씨"
+      ],
+      "description": "Pod 집합에 안정적인 네트워크 엔드포인트를 제공하는 리소스",
+      "source": "manual",
+      "confidence": 0.85,
+      "replace_policy": "context_required",
+      "context_keywords": [
+        "Kubernetes",
+        "쿠버네티스",
+        "쿠버 네티스",
+        "Pod",
+        "파드",
+        "클러스터",
+        "인그레스",
+        "로드밸런서",
+        "엔드포인트"
+      ]
+    },
+    {
+      "term_id": "K8S_008",
+      "canonical": "PVC",
+      "category": "kubernetes",
+      "aliases": [
+        "PersistentVolumeClaim",
+        "피브이씨",
+        "피이브이씨"
+      ],
+      "stt_variants": [
+        "피브이씨",
+        "피이브이씨",
+        "피 브이 씨",
+        "퍼시스턴트 볼륨 클레임",
+        "퍼시스턴트 볼륨클레임"
+      ],
+      "description": "Kubernetes 영구 볼륨 요청 리소스",
+      "source": "manual",
+      "confidence": 0.94,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_009",
+      "canonical": "PV",
+      "category": "kubernetes",
+      "aliases": [
+        "PersistentVolume",
+        "피브이",
+        "피이브이"
+      ],
+      "stt_variants": [
+        "피브이",
+        "피이브이",
+        "피 브이",
+        "퍼시스턴트 볼륨"
+      ],
+      "description": "Kubernetes 영구 볼륨 리소스",
+      "source": "manual",
+      "confidence": 0.9,
+      "replace_policy": "context_required",
+      "context_keywords": [
+        "PVC",
+        "피브이씨",
+        "피이브이씨",
+        "볼륨",
+        "마운트",
+        "스토리지",
+        "Kubernetes",
+        "이벤트"
+      ]
+    },
+    {
+      "term_id": "AWS_001",
+      "canonical": "EKS",
+      "category": "aws",
+      "aliases": [
+        "Amazon EKS",
+        "이케이에스"
+      ],
+      "stt_variants": [
+        "이 케이 에스",
+        "이케이에스",
+        "이에케이에스",
+        "이 케이스"
+      ],
+      "description": "AWS 관리형 Kubernetes 서비스",
+      "source": "manual",
+      "confidence": 0.95,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "AWS_002",
+      "canonical": "EBS",
+      "category": "aws",
+      "aliases": [
+        "Amazon EBS",
+        "이비에스"
+      ],
+      "stt_variants": [
+        "이비에스",
+        "이 비 에스",
+        "이비 에스",
+        "E 비에스"
+      ],
+      "description": "AWS 블록 스토리지 서비스",
+      "source": "manual",
+      "confidence": 0.95,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "AWS_003",
+      "canonical": "Node",
+      "category": "aws",
+      "aliases": [
+        "노드",
+        "worker node"
+      ],
+      "stt_variants": [
+        "노드",
+        "노드가",
+        "워커 노드"
+      ],
+      "description": "Kubernetes 워크로드를 실행하는 서버",
+      "source": "manual",
+      "confidence": 0.82,
+      "replace_policy": "context_required",
+      "context_keywords": [
+        "Kubernetes",
+        "쿠버네티스",
+        "쿠버 네티스",
+        "EKS",
+        "이케이에스",
+        "Pod",
+        "파드",
+        "NodeGroup",
+        "클러스터",
+        "스케줄링"
+      ]
+    },
+    {
+      "term_id": "AWS_004",
+      "canonical": "NodeGroup",
+      "category": "aws",
+      "aliases": [
+        "node group",
+        "노드그룹"
+      ],
+      "stt_variants": [
+        "노드 그룹",
+        "노드그룹",
+        "노드 구룹",
+        "노드 그룹이"
+      ],
+      "description": "EKS 워커 노드 그룹",
+      "source": "manual",
+      "confidence": 0.93,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_ERROR_001",
+      "canonical": "CrashLoopBackOff",
+      "category": "incident_status",
+      "aliases": [
+        "crash loop back off",
+        "크래시루프백오프"
+      ],
+      "stt_variants": [
+        "크래시 루프 백 오프",
+        "크래시루프 백오프",
+        "크래시 루프백 오프",
+        "크래시 루프 백업",
+        "크레시 루프 백 오프"
+      ],
+      "description": "컨테이너가 반복적으로 크래시 후 재시작되는 상태",
+      "source": "manual",
+      "confidence": 0.98,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_ERROR_002",
+      "canonical": "ImagePullBackOff",
+      "category": "incident_status",
+      "aliases": [
+        "image pull back off",
+        "이미지풀백오프"
+      ],
+      "stt_variants": [
+        "이미지 풀 백 오프",
+        "이미지풀 백오프",
+        "이미지 풀백 오프",
+        "이미지 풀 백업"
+      ],
+      "description": "컨테이너 이미지 pull 실패 후 재시도 대기 상태",
+      "source": "manual",
+      "confidence": 0.98,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_ERROR_003",
+      "canonical": "OOMKilled",
+      "category": "incident_status",
+      "aliases": [
+        "oom killed",
+        "오오엠킬드"
+      ],
+      "stt_variants": [
+        "오오엠 킬드",
+        "오엠 킬드",
+        "오엠킬드",
+        "오오엠킬드",
+        "메모리 킬드"
+      ],
+      "description": "메모리 제한 초과로 컨테이너가 종료된 상태",
+      "source": "manual",
+      "confidence": 0.95,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_PROBE_001",
+      "canonical": "Readiness Probe",
+      "category": "kubernetes",
+      "aliases": [
+        "readiness probe",
+        "레디니스 프로브"
+      ],
+      "stt_variants": [
+        "레디니스 프로브",
+        "레디니스 프루브",
+        "레디니스 프롭",
+        "레디니스 체크"
+      ],
+      "description": "Pod가 트래픽을 받을 준비가 되었는지 확인하는 probe",
+      "source": "manual",
+      "confidence": 0.95,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "K8S_PROBE_002",
+      "canonical": "Liveness Probe",
+      "category": "kubernetes",
+      "aliases": [
+        "liveness probe",
+        "라이브니스 프로브"
+      ],
+      "stt_variants": [
+        "라이브니스 프로브",
+        "라이브니스 프루브",
+        "라이브니스 프롭",
+        "라이브니스 체크"
+      ],
+      "description": "컨테이너 생존 여부를 확인하는 probe",
+      "source": "manual",
+      "confidence": 0.95,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "CICD_001",
+      "canonical": "Argo CD",
+      "category": "project_component",
+      "aliases": [
+        "argocd",
+        "아르고시디"
+      ],
+      "stt_variants": [
+        "아르고 씨디",
+        "아르고 시디",
+        "아르고 CD",
+        "아르 고 씨디",
+        "알고 씨디"
+      ],
+      "description": "GitOps 기반 Kubernetes 배포 도구",
+      "source": "manual",
+      "confidence": 0.96,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "CICD_002",
+      "canonical": "Jenkins",
+      "category": "project_component",
+      "aliases": [
+        "젠킨스"
+      ],
+      "stt_variants": [
+        "젠킨스",
+        "잰킨스",
+        "젠 킨스",
+        "젠킨슨"
+      ],
+      "description": "CI/CD 자동화 서버",
+      "source": "manual",
+      "confidence": 0.95,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "SEC_001",
+      "canonical": "Sealed Secrets",
+      "category": "project_component",
+      "aliases": [
+        "sealed-secrets",
+        "실드 시크릿"
+      ],
+      "stt_variants": [
+        "실드 시크릿",
+        "실드 시크릿츠",
+        "실드드 시크릿",
+        "씰드 시크릿"
+      ],
+      "description": "Kubernetes Secret 암호화 관리 도구",
+      "source": "manual",
+      "confidence": 0.94,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "SEC_002",
+      "canonical": "cert-manager",
+      "category": "project_component",
+      "aliases": [
+        "cert manager",
+        "서트 매니저"
+      ],
+      "stt_variants": [
+        "서트 매니저",
+        "써트 매니저",
+        "서트매니저",
+        "인증서 매니저"
+      ],
+      "description": "Kubernetes 인증서 자동 발급 및 갱신 도구",
+      "source": "manual",
+      "confidence": 0.94,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "DATA_001",
+      "canonical": "Redis",
+      "category": "project_component",
+      "aliases": [
+        "레디스"
+      ],
+      "stt_variants": [
+        "레디스",
+        "래디스",
+        "레 디스",
+        "레지스"
+      ],
+      "description": "인메모리 데이터 저장소",
+      "source": "manual",
+      "confidence": 0.95,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "DATA_002",
+      "canonical": "PostgreSQL",
+      "category": "project_component",
+      "aliases": [
+        "postgres",
+        "포스트그레스"
+      ],
+      "stt_variants": [
+        "포스트그레스",
+        "포스트 그레스",
+        "포스트그레",
+        "포스트그레 에스큐엘",
+        "포스트그레 SQL"
+      ],
+      "description": "관계형 데이터베이스",
+      "source": "manual",
+      "confidence": 0.94,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "DATA_003",
+      "canonical": "Qdrant",
+      "category": "project_component",
+      "aliases": [
+        "큐드란트"
+      ],
+      "stt_variants": [
+        "큐드란트",
+        "큐드런트",
+        "큐 드란트",
+        "큐 드런트",
+        "큐드 랜트"
+      ],
+      "description": "벡터 데이터베이스",
+      "source": "manual",
+      "confidence": 0.95,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "DOC_001",
+      "canonical": "Confluence",
+      "category": "project_component",
+      "aliases": [
+        "컨플루언스",
+        "컨플런스"
+      ],
+      "stt_variants": [
+        "컨플루언스",
+        "컨플런스",
+        "콤플런스",
+        "컴플런스",
+        "컴플러스",
+        "콤플러스",
+        "컨퍼런스",
+        "컴퍼런스",
+        "텀블런스"
+      ],
+      "description": "협업 문서 관리 도구",
+      "source": "stt_log",
+      "confidence": 0.9,
+      "replace_policy": "context_required",
+      "context_keywords": [
+        "검색",
+        "문서",
+        "스페이스",
+        "페이지",
+        "API",
+        "매뉴얼",
+        "RAG",
+        "업로드"
+      ]
+    },
+    {
+      "term_id": "AI_001",
+      "canonical": "RAG",
+      "category": "observability",
+      "aliases": [
+        "Retrieval-Augmented Generation",
+        "레그"
+      ],
+      "stt_variants": [
+        "레그",
+        "래그",
+        "RAGN",
+        "ERAG",
+        "아래지",
+        "알에이지",
+        "RNG"
+      ],
+      "description": "검색 증강 생성 방식",
+      "source": "stt_log",
+      "confidence": 0.88,
+      "replace_policy": "context_required",
+      "context_keywords": [
+        "검색",
+        "문서",
+        "인덱싱",
+        "챗봇",
+        "LLM",
+        "근거",
+        "답변"
+      ]
+    },
+    {
+      "term_id": "AI_002",
+      "canonical": "STT",
+      "category": "observability",
+      "aliases": [
+        "speech to text",
+        "에스티티"
+      ],
+      "stt_variants": [
+        "에스티티",
+        "에스 티 티",
+        "음성 텍스트 변환",
+        "음성 인식"
+      ],
+      "description": "음성을 텍스트로 변환하는 기술",
+      "source": "manual",
+      "confidence": 0.95,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "AI_003",
+      "canonical": "LLM",
+      "category": "observability",
+      "aliases": [
+        "large language model",
+        "엘엘엠"
+      ],
+      "stt_variants": [
+        "엘엘엠",
+        "엘 엘 엠",
+        "대형 언어 모델",
+        "언어 모델"
+      ],
+      "description": "대규모 언어 모델",
+      "source": "manual",
+      "confidence": 0.92,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "OBS_001",
+      "canonical": "Prometheus",
+      "category": "observability",
+      "aliases": [
+        "프로메테우스"
+      ],
+      "stt_variants": [
+        "프로메테우스",
+        "프로메스 에스",
+        "프로메테스",
+        "프로메테우스가"
+      ],
+      "description": "메트릭 수집 및 모니터링 시스템",
+      "source": "stt_log",
+      "confidence": 0.93,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "OBS_002",
+      "canonical": "Datadog",
+      "category": "observability",
+      "aliases": [
+        "데이터독"
+      ],
+      "stt_variants": [
+        "데이터 독",
+        "데이터독",
+        "데이터도",
+        "데이터도그"
+      ],
+      "description": "Observability 및 모니터링 플랫폼",
+      "source": "stt_log",
+      "confidence": 0.93,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "OBS_003",
+      "canonical": "Slack",
+      "category": "observability",
+      "aliases": [
+        "슬랙"
+      ],
+      "stt_variants": [
+        "슬랙",
+        "슬라게",
+        "슬렉",
+        "플랙"
+      ],
+      "description": "협업 메시징 도구",
+      "source": "stt_log",
+      "confidence": 0.9,
+      "replace_policy": "safe"
+    },
+    {
+      "term_id": "AWS_NET_001",
+      "canonical": "Application Load Balancer",
+      "category": "aws_networking",
+      "aliases": [
+        "ALB",
+        "어플리케이션 로드 밸런서"
+      ],
+      "stt_variants": [
+        "에이엘비",
+        "ALB",
+        "어플리케이션 로드밸런서"
+      ],
+      "description": "Layer 7 load balancer for HTTP and HTTPS traffic.",
+      "source": "official_docs",
+      "confidence": 0.93,
+      "replace_policy": "safe",
+      "source_url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
+    },
+    {
+      "term_id": "AWS_NET_002",
+      "canonical": "Elastic Load Balancing",
+      "category": "aws_networking",
+      "aliases": [
+        "ELB",
+        "로드밸런싱"
+      ],
+      "stt_variants": [
+        "이엘비",
+        "로드 밸런싱",
+        "로드밸런싱"
+      ],
+      "description": "AWS service that distributes incoming traffic across healthy targets.",
+      "source": "official_docs",
+      "confidence": 0.94,
+      "replace_policy": "safe",
+      "source_url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
+    },
+    {
+      "term_id": "AWS_NET_003",
+      "canonical": "Health Check",
+      "category": "aws_networking",
+      "aliases": [
+        "health check",
+        "헬스체크"
+      ],
+      "stt_variants": [
+        "헬스 체크",
+        "헬스체크"
+      ],
+      "description": "Mechanism for routing traffic only to healthy compute targets.",
+      "source": "official_docs",
+      "confidence": 0.91,
+      "replace_policy": "context_required",
+      "source_url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+      "context_keywords": [
+        "ALB",
+        "NLB",
+        "Elastic Load Balancing",
+        "로드밸런서",
+        "target",
+        "트래픽"
+      ]
+    },
+    {
+      "term_id": "AWS_NET_004",
+      "canonical": "Network Load Balancer",
+      "category": "aws_networking",
+      "aliases": [
+        "NLB",
+        "네트워크 로드 밸런서"
+      ],
+      "stt_variants": [
+        "엔엘비",
+        "NLB",
+        "네트워크 로드밸런서"
+      ],
+      "description": "Layer 4 load balancer for high-performance TCP, UDP, and TLS traffic.",
+      "source": "official_docs",
+      "confidence": 0.93,
+      "replace_policy": "safe",
+      "source_url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
+    },
+    {
+      "term_id": "AWS_SEC_001",
+      "canonical": "IAM",
+      "category": "aws_security",
+      "aliases": [
+        "AWS IAM",
+        "아이엠"
+      ],
+      "stt_variants": [
+        "아이에이엠",
+        "아이 엠"
+      ],
+      "description": "AWS service for managing access control for users and workloads.",
+      "source": "official_docs",
+      "confidence": 0.92,
+      "replace_policy": "safe",
+      "source_url": "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html"
+    },
+    {
+      "term_id": "AWS_STORAGE_001",
+      "canonical": "EBS Volume",
+      "category": "aws_storage",
+      "aliases": [
+        "ebs volume",
+        "EBS 볼륨"
+      ],
+      "stt_variants": [
+        "이비에스 볼륨",
+        "EBS 볼륨"
+      ],
+      "description": "Block storage volume attached to an EC2 instance.",
+      "source": "official_docs",
+      "confidence": 0.94,
+      "replace_policy": "manual_review",
+      "source_url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html"
+    },
+    {
+      "term_id": "AWS_STORAGE_002",
+      "canonical": "Elastic Volumes",
+      "category": "aws_storage",
+      "aliases": [
+        "elastic volumes"
+      ],
+      "stt_variants": [
+        "일래스틱 볼륨",
+        "엘라스틱 볼륨"
+      ],
+      "description": "Feature that lets you modify EBS volume size or performance without downtime.",
+      "source": "official_docs",
+      "confidence": 0.88,
+      "replace_policy": "manual_review",
+      "source_url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html"
+    },
+    {
+      "term_id": "AWS_STORAGE_003",
+      "canonical": "Snapshot",
+      "category": "aws_storage",
+      "aliases": [
+        "EBS snapshot",
+        "스냅샷"
+      ],
+      "stt_variants": [
+        "스냅샷",
+        "스냅 샷"
+      ],
+      "description": "Point-in-time backup of an EBS volume.",
+      "source": "official_docs",
+      "confidence": 0.92,
+      "replace_policy": "context_required",
+      "source_url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html",
+      "context_keywords": [
+        "EBS",
+        "volume",
+        "백업",
+        "restore",
+        "storage"
+      ]
+    },
+    {
+      "term_id": "CICD_003",
+      "canonical": "HookSucceeded",
+      "category": "cicd",
+      "aliases": [
+        "hook succeeded"
+      ],
+      "stt_variants": [
+        "훅 석시디드",
+        "훅 성공 삭제 정책"
+      ],
+      "description": "Argo CD hook delete policy for cleaning up successful hooks.",
+      "source": "official_docs",
+      "confidence": 0.82,
+      "replace_policy": "manual_review",
+      "source_url": "https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/"
+    },
+    {
+      "term_id": "CICD_004",
+      "canonical": "PostSync",
+      "category": "cicd",
+      "aliases": [
+        "post sync"
+      ],
+      "stt_variants": [
+        "포스트 싱크",
+        "포스트싱크"
+      ],
+      "description": "Argo CD hook phase that runs after resource synchronization.",
+      "source": "official_docs",
+      "confidence": 0.89,
+      "replace_policy": "safe",
+      "source_url": "https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/"
+    },
+    {
+      "term_id": "CICD_005",
+      "canonical": "PreSync",
+      "category": "cicd",
+      "aliases": [
+        "pre sync"
+      ],
+      "stt_variants": [
+        "프리 싱크",
+        "프리싱크"
+      ],
+      "description": "Argo CD hook phase that runs before resource synchronization.",
+      "source": "official_docs",
+      "confidence": 0.89,
+      "replace_policy": "safe",
+      "source_url": "https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/"
+    },
+    {
+      "term_id": "CICD_006",
+      "canonical": "Sync Wave",
+      "category": "cicd",
+      "aliases": [
+        "sync-wave",
+        "싱크 웨이브"
+      ],
+      "stt_variants": [
+        "싱크 웨이브",
+        "싱크웨이브",
+        "sync wave"
+      ],
+      "description": "Argo CD deployment ordering mechanism based on integer wave annotations.",
+      "source": "official_docs",
+      "confidence": 0.92,
+      "replace_policy": "safe",
+      "source_url": "https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/"
+    },
+    {
+      "term_id": "DEPLOY_001",
+      "canonical": "maxSurge",
+      "category": "deployment_strategy",
+      "aliases": [
+        "max surge"
+      ],
+      "stt_variants": [
+        "맥스 서지",
+        "맥스 써지"
+      ],
+      "description": "Rolling update setting that limits extra Pods during rollout.",
+      "source": "official_docs",
+      "confidence": 0.84,
+      "replace_policy": "manual_review",
+      "source_url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
+    },
+    {
+      "term_id": "DEPLOY_002",
+      "canonical": "maxUnavailable",
+      "category": "deployment_strategy",
+      "aliases": [
+        "max unavailable"
+      ],
+      "stt_variants": [
+        "맥스 언어베일러블",
+        "맥스 언어베일러블 값"
+      ],
+      "description": "Rolling update setting that limits unavailable Pods during rollout.",
+      "source": "official_docs",
+      "confidence": 0.84,
+      "replace_policy": "manual_review",
+      "source_url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
+    },
+    {
+      "term_id": "DEPLOY_003",
+      "canonical": "RollingUpdate",
+      "category": "deployment_strategy",
+      "aliases": [
+        "rolling update",
+        "롤링업데이트"
+      ],
+      "stt_variants": [
+        "롤링 업데이트",
+        "롤링업데이트"
+      ],
+      "description": "Deployment strategy that gradually replaces old Pods with new Pods.",
+      "source": "official_docs",
+      "confidence": 0.92,
+      "replace_policy": "safe",
+      "source_url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
+    },
+    {
+      "term_id": "K8S_010",
+      "canonical": "ConfigMap",
+      "category": "kubernetes",
+      "aliases": [
+        "config map",
+        "컨피그맵"
+      ],
+      "stt_variants": [
+        "컨피그맵",
+        "컨피그 맵",
+        "설정 맵"
+      ],
+      "description": "API object used to store non-confidential configuration data.",
+      "source": "official_docs",
+      "confidence": 0.93,
+      "replace_policy": "safe",
+      "source_url": "https://kubernetes.io/docs/reference/glossary/?all=true"
+    },
+    {
+      "term_id": "K8S_011",
+      "canonical": "DaemonSet",
+      "category": "kubernetes",
+      "aliases": [
+        "데몬셋"
+      ],
+      "stt_variants": [
+        "데몬 셋",
+        "데몬셋"
+      ],
+      "description": "Workload resource that ensures a Pod runs on selected nodes.",
+      "source": "official_docs",
+      "confidence": 0.93,
+      "replace_policy": "safe",
+      "source_url": "https://kubernetes.io/docs/reference/glossary/?all=true"
+    },
+    {
+      "term_id": "K8S_012",
+      "canonical": "HorizontalPodAutoscaler",
+      "category": "kubernetes",
+      "aliases": [
+        "HPA",
+        "에이치피에이"
+      ],
+      "stt_variants": [
+        "에이치 피 에이",
+        "에이치피에이",
+        "호리즌탈 파드 오토스케일러"
+      ],
+      "description": "Resource that automatically scales workload replicas based on metrics.",
+      "source": "official_docs",
+      "confidence": 0.94,
+      "replace_policy": "safe",
+      "source_url": "https://kubernetes.io/docs/reference/glossary/?all=true"
+    },
+    {
+      "term_id": "K8S_013",
+      "canonical": "Init Container",
+      "category": "kubernetes",
+      "aliases": [
+        "init container",
+        "이닛 컨테이너"
+      ],
+      "stt_variants": [
+        "이닛 컨테이너",
+        "이니트 컨테이너",
+        "초기화 컨테이너"
+      ],
+      "description": "Specialized container that runs before app containers start.",
+      "source": "official_docs",
+      "confidence": 0.9,
+      "replace_policy": "safe",
+      "source_url": "https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/"
+    },
+    {
+      "term_id": "K8S_014",
+      "canonical": "ReplicaSet",
+      "category": "kubernetes",
+      "aliases": [
+        "rs",
+        "레플리카셋"
+      ],
+      "stt_variants": [
+        "레플리카 셋",
+        "레플리카셋"
+      ],
+      "description": "Controller that maintains a stable set of replica Pods.",
+      "source": "official_docs",
+      "confidence": 0.93,
+      "replace_policy": "safe",
+      "source_url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
+    },
+    {
+      "term_id": "K8S_015",
+      "canonical": "Secret",
+      "category": "kubernetes",
+      "aliases": [
+        "시크릿"
+      ],
+      "stt_variants": [
+        "시크릿",
+        "씨크릿",
+        "비밀 리소스"
+      ],
+      "description": "API object for storing sensitive data such as credentials and tokens.",
+      "source": "official_docs",
+      "confidence": 0.92,
+      "replace_policy": "context_required",
+      "source_url": "https://kubernetes.io/docs/reference/glossary/?all=true",
+      "context_keywords": [
+        "Kubernetes",
+        "ConfigMap",
+        "token",
+        "credential",
+        "시크릿"
+      ]
+    },
+    {
+      "term_id": "K8S_SEC_001",
+      "canonical": "Service Account",
+      "category": "kubernetes_security",
+      "aliases": [
+        "service account",
+        "서비스 어카운트"
+      ],
+      "stt_variants": [
+        "서비스 어카운트",
+        "서비스 어카운트 토큰"
+      ],
+      "description": "Identity object used by workloads to access Kubernetes or AWS resources.",
+      "source": "official_docs",
+      "confidence": 0.9,
+      "replace_policy": "context_required",
+      "source_url": "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html",
+      "context_keywords": [
+        "EKS",
+        "IAM",
+        "Kubernetes",
+        "token",
+        "role",
+        "워크로드"
+      ]
+    },
+    {
+      "term_id": "K8S_STORAGE_003",
+      "canonical": "StorageClass",
+      "category": "kubernetes_storage",
+      "aliases": [
+        "storage class",
+        "스토리지클래스"
+      ],
+      "stt_variants": [
+        "스토리지 클래스",
+        "스토리지클래스"
+      ],
+      "description": "Resource that describes classes of storage available in a cluster.",
+      "source": "official_docs",
+      "confidence": 0.93,
+      "replace_policy": "safe",
+      "source_url": "https://kubernetes.io/docs/reference/glossary/?all=true"
+    },
+    {
+      "term_id": "OBS_004",
+      "canonical": "ADOT Operator",
+      "category": "observability",
+      "aliases": [
+        "AWS Distro for OpenTelemetry",
+        "에이닷 오퍼레이터"
+      ],
+      "stt_variants": [
+        "에이닷 오퍼레이터",
+        "에이 디 오 티 오퍼레이터"
+      ],
+      "description": "AWS Distro for OpenTelemetry operator for EKS observability integration.",
+      "source": "official_docs",
+      "confidence": 0.88,
+      "replace_policy": "manual_review",
+      "source_url": "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html"
+    },
+    {
+      "term_id": "OBS_005",
+      "canonical": "Baggage",
+      "category": "observability",
+      "aliases": [
+        "baggage"
+      ],
+      "stt_variants": [
+        "배기지",
+        "배기지 컨텍스트"
+      ],
+      "description": "Context propagation mechanism for custom key-value pairs.",
+      "source": "official_docs",
+      "confidence": 0.84,
+      "replace_policy": "manual_review",
+      "source_url": "https://opentelemetry.io/docs/concepts/signals/"
+    },
+    {
+      "term_id": "OBS_006",
+      "canonical": "CloudWatch",
+      "category": "observability",
+      "aliases": [
+        "Amazon CloudWatch",
+        "클라우드와치"
+      ],
+      "stt_variants": [
+        "클라우드 와치",
+        "클라우드와치"
+      ],
+      "description": "AWS monitoring service used for logs, metrics, and alarms.",
+      "source": "official_docs",
+      "confidence": 0.94,
+      "replace_policy": "safe",
+      "source_url": "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html"
+    },
+    {
+      "term_id": "OBS_007",
+      "canonical": "Log",
+      "category": "observability",
+      "aliases": [
+        "logs",
+        "로그"
+      ],
+      "stt_variants": [
+        "로그",
+        "로깅"
+      ],
+      "description": "Signal that records events or messages emitted by a system.",
+      "source": "official_docs",
+      "confidence": 0.9,
+      "replace_policy": "context_required",
+      "source_url": "https://opentelemetry.io/docs/concepts/signals/",
+      "context_keywords": [
+        "OpenTelemetry",
+        "오픈텔레메트리",
+        "오픈 텔레메트리",
+        "Collector",
+        "컬렉터",
+        "CloudWatch",
+        "클라우드와치"
+      ]
+    },
+    {
+      "term_id": "OBS_008",
+      "canonical": "Metric",
+      "category": "observability",
+      "aliases": [
+        "metrics",
+        "메트릭"
+      ],
+      "stt_variants": [
+        "메트릭",
+        "메트릭스"
+      ],
+      "description": "Signal that represents measurements of runtime behavior over time.",
+      "source": "official_docs",
+      "confidence": 0.9,
+      "replace_policy": "context_required",
+      "source_url": "https://opentelemetry.io/docs/concepts/signals/",
+      "context_keywords": [
+        "OpenTelemetry",
+        "오픈텔레메트리",
+        "오픈 텔레메트리",
+        "Collector",
+        "컬렉터",
+        "CloudWatch",
+        "클라우드와치"
+      ]
+    },
+    {
+      "term_id": "OBS_009",
+      "canonical": "OpenTelemetry",
+      "category": "observability",
+      "aliases": [
+        "otel",
+        "오픈텔레메트리"
+      ],
+      "stt_variants": [
+        "오픈 텔레메트리",
+        "오픈텔레메트리",
+        "오텔"
+      ],
+      "description": "Observability framework for generating and collecting telemetry data.",
+      "source": "official_docs",
+      "confidence": 0.94,
+      "replace_policy": "safe",
+      "source_url": "https://opentelemetry.io/docs/concepts/"
+    },
+    {
+      "term_id": "OBS_010",
+      "canonical": "OpenTelemetry Collector",
+      "category": "observability",
+      "aliases": [
+        "otel collector",
+        "오텔 컬렉터"
+      ],
+      "stt_variants": [
+        "오텔 컬렉터",
+        "오픈텔레메트리 컬렉터"
+      ],
+      "description": "Vendor-agnostic component for receiving, processing, and exporting telemetry.",
+      "source": "official_docs",
+      "confidence": 0.91,
+      "replace_policy": "safe",
+      "source_url": "https://opentelemetry.io/docs/concepts/"
+    },
+    {
+      "term_id": "OBS_011",
+      "canonical": "Span",
+      "category": "observability",
+      "aliases": [
+        "span",
+        "스팬"
+      ],
+      "stt_variants": [
+        "스팬",
+        "span"
+      ],
+      "description": "Single operation within a trace that captures timing and metadata.",
+      "source": "official_docs",
+      "confidence": 0.88,
+      "replace_policy": "context_required",
+      "source_url": "https://opentelemetry.io/docs/concepts/",
+      "context_keywords": [
+        "OpenTelemetry",
+        "Trace",
+        "Collector",
+        "트레이스"
+      ]
+    },
+    {
+      "term_id": "OBS_012",
+      "canonical": "Trace",
+      "category": "observability",
+      "aliases": [
+        "traces",
+        "트레이스"
+      ],
+      "stt_variants": [
+        "트레이스",
+        "트레이싱"
+      ],
+      "description": "Signal that represents the path of a request through a system.",
+      "source": "official_docs",
+      "confidence": 0.9,
+      "replace_policy": "context_required",
+      "source_url": "https://opentelemetry.io/docs/concepts/signals/",
+      "context_keywords": [
+        "OpenTelemetry",
+        "오픈텔레메트리",
+        "오픈 텔레메트리",
+        "Collector",
+        "컬렉터",
+        "CloudWatch",
+        "클라우드와치"
+      ]
+    }
+  ]
+}

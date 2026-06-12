@@ -5,10 +5,17 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import ChunkStatus, JobStatus, TranscriptionChunk, TranscriptionJob
+from app.db.models import (
+    ChunkStatus,
+    CorrectedTranscript,
+    JobStatus,
+    SttCorrectionLog,
+    TranscriptionChunk,
+    TranscriptionJob,
+)
 from app.db.postgres import session_scope
 
 router = APIRouter(prefix="/internal/transcriptions", tags=["internal-transcriptions"])
@@ -44,14 +51,26 @@ class TranscriptSegmentResponse(BaseModel):
     confidence: float | None = None
 
 
+class TranscriptBodyResponse(BaseModel):
+    text_sha256: str
+    text: str
+    segments: list[TranscriptSegmentResponse]
+
+
+class CorrectedTranscriptBodyResponse(TranscriptBodyResponse):
+    correction_count: int
+    review_candidate_count: int
+
+
 class TranscriptionResultResponse(BaseModel):
     schema_version: str = "1.0"
     transcription_id: UUID
     tenant_id: str
     provider: str
     audio_duration_sec: float | None
-    text: str
-    segments: list[TranscriptSegmentResponse]
+    dictionary_version: str
+    raw: TranscriptBodyResponse
+    corrected: CorrectedTranscriptBodyResponse
 
 
 @router.get("/{transcription_id}", response_model=TranscriptionStatusResponse)
@@ -78,7 +97,7 @@ async def get_transcription_status(
         completed_chunks=job.completed_chunks,
         failed_chunks=job.failed_chunks,
         audio_duration_sec=job.audio_duration_sec,
-        result_available=job.merged_text is not None,
+        result_available=job.status == JobStatus.correction_completed,
         chunks=[
             ChunkStatusResponse(
                 chunk_index=chunk.chunk_index,
@@ -100,13 +119,42 @@ async def get_transcription_result(
     job = await session.get(TranscriptionJob, transcription_id)
     if job is None:
         raise HTTPException(status_code=404, detail="Transcription not found.")
-    if job.status != JobStatus.transcript_completed or job.merged_text is None:
+    corrected = await session.scalar(
+        select(CorrectedTranscript)
+        .where(CorrectedTranscript.transcription_id == transcription_id)
+        .order_by(CorrectedTranscript.created_at.desc())
+    )
+    correction_count = (
+        await session.scalar(
+            select(func.count(SttCorrectionLog.id)).where(SttCorrectionLog.corrected_transcript_id == corrected.id)
+        )
+        if corrected is not None
+        else 0
+    )
+    if job.status != JobStatus.correction_completed or job.merged_text is None or corrected is None:
         raise HTTPException(status_code=409, detail="Transcription result is not ready.")
     return TranscriptionResultResponse(
         transcription_id=job.id,
         tenant_id=job.tenant_id,
         provider=job.provider,
         audio_duration_sec=job.audio_duration_sec,
-        text=job.merged_text,
-        segments=[TranscriptSegmentResponse.model_validate(segment) for segment in (job.merged_segments_json or [])],
+        dictionary_version=corrected.dictionary_version,
+        raw=TranscriptBodyResponse(
+            text_sha256=_sha256(job.merged_text),
+            text=job.merged_text,
+            segments=[TranscriptSegmentResponse.model_validate(segment) for segment in (job.merged_segments_json or [])],
+        ),
+        corrected=CorrectedTranscriptBodyResponse(
+            text_sha256=corrected.corrected_text_sha256,
+            text=corrected.corrected_text,
+            segments=[TranscriptSegmentResponse.model_validate(segment) for segment in corrected.corrected_segments_json],
+            correction_count=int(correction_count or 0),
+            review_candidate_count=len(corrected.review_candidates_json or []),
+        ),
     )
+
+
+def _sha256(text: str) -> str:
+    import hashlib
+
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()

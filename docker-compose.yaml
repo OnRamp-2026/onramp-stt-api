@@ -119,6 +119,18 @@ services:
       api:
         condition: service_healthy
 
+  correction-worker:
+    build: .
+    profiles: ["pipeline"]
+    env_file:
+      - path: .env
+        required: false
+    environment: *app-environment
+    command: python -m app.workers.correction
+    depends_on:
+      api:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   redis_data:

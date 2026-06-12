@@ -48,6 +48,16 @@ class TranscriptCompleted(BaseModel):
     result_object_key: str
 
 
+class TranscriptionCompleted(BaseModel):
+    transcription_id: UUID
+    tenant_id: str = Field(min_length=1, max_length=128)
+    raw_text_sha256: str = Field(min_length=64, max_length=64)
+    corrected_text_sha256: str = Field(min_length=64, max_length=64)
+    dictionary_version: str = Field(min_length=1, max_length=32)
+    result_object_key: str = Field(min_length=1)
+    completed_at: datetime
+
+
 def encode_envelope(envelope: StreamEnvelope) -> dict[str, str]:
     return {
         "event_id": envelope.event_id,

@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from app.queue.events import (
     StreamEnvelope,
+    TranscriptionCompleted,
     TranscriptCompleted,
     TranscriptionRequested,
     decode_envelope,
@@ -38,6 +39,27 @@ def test_transcript_completed_round_trip() -> None:
     envelope = StreamEnvelope(
         event_id="evt-2",
         event_type="transcription.transcript.completed",
+        payload=payload.model_dump(mode="json"),
+    )
+
+    decoded = decode_envelope(encode_envelope(envelope))
+
+    assert decoded == envelope
+
+
+def test_transcription_completed_round_trip() -> None:
+    payload = TranscriptionCompleted(
+        transcription_id=uuid4(),
+        tenant_id="tenant-a",
+        raw_text_sha256="a" * 64,
+        corrected_text_sha256="b" * 64,
+        dictionary_version="2026-06-12",
+        result_object_key="tenants/tenant-a/transcriptions/abc/result/corrected-transcript.json",
+        completed_at="2026-06-12T03:10:00Z",
+    )
+    envelope = StreamEnvelope(
+        event_id="evt-3",
+        event_type="transcription.completed",
         payload=payload.model_dump(mode="json"),
     )
 

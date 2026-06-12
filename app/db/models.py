@@ -80,6 +80,10 @@ class TranscriptionJob(Base):
         back_populates="job",
         cascade="all, delete-orphan",
     )
+    corrected_transcripts: Mapped[list[CorrectedTranscript]] = relationship(
+        back_populates="job",
+        cascade="all, delete-orphan",
+    )
 
     __table_args__ = (UniqueConstraint("tenant_id", "id", name="uq_transcription_job_tenant_id"),)
 
@@ -141,3 +145,57 @@ class EventInbox(Base):
     event_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     processed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     result_reference: Mapped[str | None] = mapped_column(Text)
+
+
+class CorrectedTranscript(Base):
+    __tablename__ = "corrected_transcripts"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    tenant_id: Mapped[str] = mapped_column(String(128), index=True)
+    transcription_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("transcription_jobs.id", ondelete="CASCADE"),
+        index=True,
+    )
+    raw_text_sha256: Mapped[str] = mapped_column(String(64))
+    corrected_text: Mapped[str] = mapped_column(Text)
+    corrected_segments_json: Mapped[list[dict[str, Any]]] = mapped_column(JSON)
+    corrected_text_sha256: Mapped[str] = mapped_column(String(64))
+    dictionary_version: Mapped[str] = mapped_column(String(32), index=True)
+    status: Mapped[str] = mapped_column(String(32), default="completed")
+    result_object_key: Mapped[str | None] = mapped_column(Text)
+    review_candidates_json: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
+    prompt_version: Mapped[str | None] = mapped_column(String(128))
+    llm_applied: Mapped[bool] = mapped_column(default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    job: Mapped[TranscriptionJob] = relationship(back_populates="corrected_transcripts")
+    logs: Mapped[list[SttCorrectionLog]] = relationship(
+        back_populates="corrected_transcript",
+        cascade="all, delete-orphan",
+    )
+
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "transcription_id", "dictionary_version", name="uq_corrected_transcript_version"),
+    )
+
+
+class SttCorrectionLog(Base):
+    __tablename__ = "stt_correction_logs"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    corrected_transcript_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("corrected_transcripts.id", ondelete="CASCADE"),
+        index=True,
+    )
+    segment_index: Mapped[int] = mapped_column(Integer)
+    start_time_sec: Mapped[float] = mapped_column(Float)
+    end_time_sec: Mapped[float] = mapped_column(Float)
+    term_id: Mapped[str] = mapped_column(String(64))
+    replace_policy: Mapped[str] = mapped_column(String(32))
+    original_text: Mapped[str] = mapped_column(Text)
+    corrected_text: Mapped[str] = mapped_column(Text)
+    context_evidence: Mapped[str | None] = mapped_column(Text)
+    decision: Mapped[str] = mapped_column(String(32))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    corrected_transcript: Mapped[CorrectedTranscript] = relationship(back_populates="logs")
