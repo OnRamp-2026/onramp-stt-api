@@ -328,7 +328,9 @@ class ClovaChunkService:
             status=job.status.value,
             completed_chunks=job.completed_chunks,
             total_chunks=job.total_chunks,
+            failed_chunks=job.failed_chunks,
             progress_ratio=ratio,
+            occurred_at=now,
         )
         session.add(
             EventOutbox(

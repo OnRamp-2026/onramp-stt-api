@@ -1,6 +1,8 @@
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from app.queue.events import (
+    ProgressUpdated,
     StreamEnvelope,
     TranscriptionCompleted,
     TranscriptCompleted,
@@ -22,6 +24,28 @@ def test_stream_envelope_round_trip() -> None:
     envelope = StreamEnvelope(
         event_id="evt-1",
         event_type="transcription.requested",
+        payload=payload.model_dump(mode="json"),
+    )
+
+    decoded = decode_envelope(encode_envelope(envelope))
+
+    assert decoded == envelope
+
+
+def test_progress_updated_round_trip() -> None:
+    payload = ProgressUpdated(
+        transcription_id=uuid4(),
+        tenant_id="tenant-a",
+        status="transcribing",
+        completed_chunks=31,
+        total_chunks=64,
+        failed_chunks=0,
+        progress_ratio=31 / 64,
+        occurred_at=datetime.now(UTC),
+    )
+    envelope = StreamEnvelope(
+        event_id="evt-3",
+        event_type="transcription.progressed",
         payload=payload.model_dump(mode="json"),
     )
 

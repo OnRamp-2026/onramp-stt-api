@@ -6,7 +6,7 @@ STT_COMPLETED_STREAM = "onramp:stt:completed:v1"
 STT_COMMAND_STREAM = "onramp:stt:commands:v1"
 STT_DLQ_STREAM = "onramp:stt:dlq:v1"
 
-PROGRESS_EVENT_TYPE = "transcription.progress.updated"
+PROGRESS_EVENT_TYPE = "transcription.progressed"
 TRANSCRIPT_COMPLETED_EVENT_TYPE = "transcription.transcript.completed"
 COMPLETED_EVENT_TYPE = "transcription.completed"
 
