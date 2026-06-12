@@ -5,7 +5,7 @@ import random
 import tempfile
 import uuid
 from dataclasses import asdict
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import structlog
@@ -44,9 +44,9 @@ class ClovaChunkService:
         self.storage = storage
         self.provider = provider
 
-    async def process(self, envelope: StreamEnvelope) -> None:
+    async def process(self, envelope: StreamEnvelope, worker_id: str) -> None:
         request = ChunkRequested.model_validate(envelope.payload)
-        chunk = await self._claim(request, envelope.event_id)
+        chunk = await self._claim(request, envelope.event_id, worker_id)
         if chunk is None:
             return
 
@@ -81,7 +81,13 @@ class ClovaChunkService:
 
             await self._record_success(request, envelope.event_id, raw_key, result)
 
-    async def _claim(self, request: ChunkRequested, event_id: str) -> TranscriptionChunk | None:
+    async def _claim(
+        self,
+        request: ChunkRequested,
+        event_id: str,
+        worker_id: str,
+    ) -> TranscriptionChunk | None:
+        claimed_at = utcnow()
         async with self.session_factory() as session, session.begin():
             if await is_processed(session, CLOVA_WORKER_GROUP, event_id):
                 return None
@@ -100,11 +106,13 @@ class ClovaChunkService:
             if chunk.status == ChunkStatus.completed:
                 mark_processed(session, CLOVA_WORKER_GROUP, event_id, str(chunk.id))
                 return None
-            if chunk.status not in {ChunkStatus.pending, ChunkStatus.retry_wait}:
+            if not can_claim_chunk(chunk.status, chunk.lease_expires_at, claimed_at):
                 raise ValueError(f"Chunk cannot be claimed from status {chunk.status.value}.")
             chunk.status = ChunkStatus.processing
             chunk.error_code = None
             chunk.error_message = None
+            chunk.lease_owner = worker_id
+            chunk.lease_expires_at = claimed_at + timedelta(seconds=self.settings.clova_chunk_lease_sec)
             return chunk
 
     async def _record_success(
@@ -138,6 +146,8 @@ class ClovaChunkService:
             chunk.recognized_text = result.full_text
             chunk.normalized_segments_json = [asdict(segment) for segment in result.segments]
             chunk.next_retry_at = None
+            chunk.lease_owner = None
+            chunk.lease_expires_at = None
             job.completed_chunks += 1
             if job.completed_chunks == job.total_chunks:
                 job.status = JobStatus.merging
@@ -173,6 +183,8 @@ class ClovaChunkService:
             chunk.retry_count += 1
             chunk.error_code = error.code
             chunk.error_message = str(error)[:2000]
+            chunk.lease_owner = None
+            chunk.lease_expires_at = None
             can_retry = error.retryable and chunk.retry_count <= self.settings.clova_max_retry_count
             if can_retry:
                 delay = min(
@@ -215,3 +227,13 @@ class ClovaChunkService:
                     )
                 )
             mark_processed(session, CLOVA_WORKER_GROUP, envelope.event_id, str(chunk.id))
+
+
+def can_claim_chunk(
+    status: ChunkStatus,
+    lease_expires_at: datetime | None,
+    claimed_at: datetime,
+) -> bool:
+    if status in {ChunkStatus.pending, ChunkStatus.retry_wait}:
+        return True
+    return status == ChunkStatus.processing and (lease_expires_at is None or lease_expires_at <= claimed_at)

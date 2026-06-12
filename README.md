@@ -62,6 +62,17 @@ CLOVA worker까지 실행:
 docker compose --profile pipeline up --build -d
 ```
 
+호스트에서 `scripts/enqueue_audio.py`를 실행할 때는 `.env`의 storage 설정을
+Compose의 MinIO에 맞춥니다.
+
+```dotenv
+STORAGE_BACKEND=s3
+STORAGE_ENDPOINT_URL=http://localhost:9000
+STORAGE_ACCESS_KEY=onramp
+STORAGE_SECRET_KEY=onramp-secret
+STORAGE_BUCKET=onramp-stt
+```
+
 서비스:
 
 | 서비스 | 로컬 주소 |
@@ -121,6 +132,8 @@ worker 역할:
 | `STT_VAD_MAX_CHUNK_SECONDS` | `55` | 내부 청크 상한 |
 | `CLOVA_MAX_CONCURRENT_JOBS` | `2` | 전체 worker 전역 동시 요청 수 |
 | `CLOVA_MAX_RETRY_COUNT` | `3` | retryable 오류 재시도 횟수 |
+| `CLOVA_CHUNK_LEASE_SEC` | `600` | 중단된 processing 청크 재점유 대기 시간 |
+| `REDIS_PENDING_RECLAIM_IDLE_MS` | `300000` | 중단된 Redis 메시지 회수 기준 |
 
 CLOVA 요청은 `ko-KR`, sync, word alignment, noise filtering, diarization을 사용합니다. `boostings`와 `useDomainBoostings`는 보내지 않습니다.
 

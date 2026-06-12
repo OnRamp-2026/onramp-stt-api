@@ -2,7 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -42,10 +42,18 @@ class Settings(BaseSettings):
     clova_backoff_base_sec: float = Field(default=2, ge=0)
     clova_backoff_max_sec: float = Field(default=60, ge=0)
     clova_semaphore_lease_sec: int = Field(default=240, ge=1)
+    clova_chunk_lease_sec: int = Field(default=600, ge=1)
 
     redis_stream_block_ms: int = Field(default=5000, ge=1)
     redis_stream_read_count: int = Field(default=10, ge=1)
     redis_pending_reclaim_idle_ms: int = Field(default=300000, ge=1)
+
+    @field_validator("stt_vad_frame_ms", mode="before")
+    @classmethod
+    def _coerce_frame_ms(cls, value: object) -> object:
+        if isinstance(value, str):
+            return int(value)
+        return value
 
     model_config = {
         "env_file": ".env",

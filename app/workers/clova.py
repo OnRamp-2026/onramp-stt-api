@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import os
 import socket
-from typing import Any, cast
 
 import structlog
 
@@ -11,6 +10,7 @@ from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.db.postgres import get_session_factory
 from app.queue.constants import CLOVA_WORKER_GROUP, STT_CHUNK_STREAM
+from app.queue.consumer import read_new_or_reclaim_pending
 from app.queue.events import decode_envelope
 from app.queue.redis import bootstrap_consumer_groups, get_redis
 from app.queue.semaphore import RedisLeaseSemaphore
@@ -53,15 +53,14 @@ async def run() -> None:
     )
 
     while True:
-        messages = cast(
-            list[tuple[str, list[tuple[str, dict[str, str]]]]],
-            await cast(Any, redis).xreadgroup(
-                CLOVA_WORKER_GROUP,
-                consumer,
-                {STT_CHUNK_STREAM: ">"},
-                count=1,
-                block=settings.redis_stream_block_ms,
-            ),
+        messages = await read_new_or_reclaim_pending(
+            redis,
+            stream=STT_CHUNK_STREAM,
+            group=CLOVA_WORKER_GROUP,
+            consumer=consumer,
+            count=1,
+            block_ms=settings.redis_stream_block_ms,
+            reclaim_idle_ms=settings.redis_pending_reclaim_idle_ms,
         )
         for _, entries in messages:
             for message_id, fields in entries:
@@ -79,7 +78,7 @@ async def run() -> None:
                     )
                 )
                 try:
-                    await service.process(decode_envelope(fields))
+                    await service.process(decode_envelope(fields), consumer)
                 except Exception:
                     await logger.aexception("clova_event_failed", message_id=message_id)
                     continue
