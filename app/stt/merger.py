@@ -44,7 +44,7 @@ def merge_chunk_segments(
 def map_chunk_time(value: float, mappings: list[dict[str, float]]) -> float:
     if not mappings:
         return value
-    for mapping in mappings:
+    for index, mapping in enumerate(mappings):
         chunk_start = float(mapping["chunk_start_sec"])
         chunk_end = float(mapping["chunk_end_sec"])
         if chunk_start <= value <= chunk_end:
@@ -52,6 +52,12 @@ def map_chunk_time(value: float, mappings: list[dict[str, float]]) -> float:
             source_end = float(mapping["source_end_sec"])
             mapped = source_start + (value - chunk_start)
             return min(mapped, source_end)
+        if index and value < chunk_start:
+            previous = mappings[index - 1]
+            previous_chunk_end = float(previous["chunk_end_sec"])
+            if value - previous_chunk_end <= chunk_start - value:
+                return float(previous["source_end_sec"])
+            return float(mapping["source_start_sec"])
     first = mappings[0]
     if value < float(first["chunk_start_sec"]):
         return float(first["source_start_sec"])
