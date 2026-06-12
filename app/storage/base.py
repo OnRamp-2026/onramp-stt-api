@@ -1,0 +1,13 @@
+from collections.abc import AsyncIterator
+from pathlib import Path
+from typing import Protocol
+
+
+class ObjectStorage(Protocol):
+    async def download(self, object_key: str, destination: Path) -> Path: ...
+
+    async def upload(self, source: Path, object_key: str, *, content_type: str | None = None) -> str: ...
+
+    def open_stream(self, object_key: str) -> AsyncIterator[bytes]: ...
+
+    async def exists(self, object_key: str) -> bool: ...
