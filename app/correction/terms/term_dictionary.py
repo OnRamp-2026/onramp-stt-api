@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import json
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
-
 
 DEFAULT_TERMS_PATH = Path(__file__).with_name("domain_terms.json")
 
@@ -25,7 +24,7 @@ class DomainTerm:
     context_keywords: tuple[str, ...] = field(default_factory=tuple)
 
     @classmethod
-    def from_dict(cls, data: dict) -> "DomainTerm":
+    def from_dict(cls, data: dict) -> DomainTerm:
         return cls(
             term_id=data["term_id"],
             canonical=data["canonical"],

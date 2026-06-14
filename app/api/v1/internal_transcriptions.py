@@ -142,12 +142,16 @@ async def get_transcription_result(
         raw=TranscriptBodyResponse(
             text_sha256=_sha256(job.merged_text),
             text=job.merged_text,
-            segments=[TranscriptSegmentResponse.model_validate(segment) for segment in (job.merged_segments_json or [])],
+            segments=[
+                TranscriptSegmentResponse.model_validate(segment) for segment in (job.merged_segments_json or [])
+            ],
         ),
         corrected=CorrectedTranscriptBodyResponse(
             text_sha256=corrected.corrected_text_sha256,
             text=corrected.corrected_text,
-            segments=[TranscriptSegmentResponse.model_validate(segment) for segment in corrected.corrected_segments_json],
+            segments=[
+                TranscriptSegmentResponse.model_validate(segment) for segment in corrected.corrected_segments_json
+            ],
             correction_count=int(correction_count or 0),
             review_candidate_count=len(corrected.review_candidates_json or []),
         ),

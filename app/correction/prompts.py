@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from .glossary import GlossaryEntry, render_glossary
 
-
 PROMPT_VERSION = "strict_glossary_segment_preserving_v1"
 
 

@@ -7,7 +7,6 @@ from pathlib import Path
 
 from .term_dictionary import DEFAULT_TERMS_PATH
 
-
 CATEGORY_PREFIXES = {
     "ai": "AI",
     "aws": "AWS",
@@ -144,7 +143,10 @@ class JsonTermIngestionService:
 
     def _load_terms_payload(self) -> dict:
         if self.terms_path.exists():
-            return json.loads(self.terms_path.read_text(encoding="utf-8"))
+            payload = json.loads(self.terms_path.read_text(encoding="utf-8"))
+            if not isinstance(payload, dict):
+                raise ValueError("Term dictionary payload must be a JSON object")
+            return payload
         return {
             "version": date.today().isoformat(),
             "description": (
