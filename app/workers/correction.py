@@ -41,9 +41,10 @@ async def run() -> None:
             for message_id, fields in entries:
                 try:
                     await service.process(decode_envelope(fields))
-                except Exception:
+                except Exception as exc:
                     await logger.aexception("correction_event_failed", message_id=message_id)
-                    continue
+                    if not await service.record_failure(decode_envelope(fields), exc):
+                        continue
                 await redis.xack(STT_TRANSCRIPT_COMPLETED_STREAM, CORRECTION_WORKER_GROUP, message_id)
 
 

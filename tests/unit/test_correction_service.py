@@ -12,6 +12,11 @@ class FakeLlmClient:
         return self.response
 
 
+class FailingLlmClient:
+    def complete(self, prompt: str) -> str:
+        raise TimeoutError("temporary LLM timeout")
+
+
 def test_correction_service_preserves_segment_shape_and_applies_llm_output() -> None:
     settings = Settings(
         stt_correction_enable_llm=True,
@@ -98,3 +103,19 @@ def test_correction_service_marks_llm_verified_for_candidate_resolution() -> Non
     assert len(result.correction_logs) == 1
     assert result.correction_logs[0].decision == "llm_verified"
     assert result.llm_applied is True
+
+
+def test_correction_service_falls_back_to_rules_when_llm_fails() -> None:
+    settings = Settings(
+        stt_correction_enable_llm=True,
+        openai_api_key="test-key",
+    )
+    raw_segments = [
+        {"start_time_sec": 0.0, "end_time_sec": 1.0, "text": "슬랙으로 공유해주세요."},
+    ]
+    service = CorrectionService(settings, llm_client=FailingLlmClient())
+
+    result = service.correct("슬랙으로 공유해주세요.", raw_segments)
+
+    assert result.corrected_text == "Slack으로 공유해주세요."
+    assert result.llm_applied is False

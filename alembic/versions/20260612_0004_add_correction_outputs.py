@@ -37,7 +37,9 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.ForeignKeyConstraint(["transcription_id"], ["transcription_jobs.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("tenant_id", "transcription_id", "dictionary_version", name="uq_corrected_transcript_version"),
+        sa.UniqueConstraint(
+            "tenant_id", "transcription_id", "dictionary_version", name="uq_corrected_transcript_version"
+        ),
     )
     op.create_index("ix_corrected_transcripts_tenant_id", "corrected_transcripts", ["tenant_id"])
     op.create_index("ix_corrected_transcripts_transcription_id", "corrected_transcripts", ["transcription_id"])
@@ -60,7 +62,9 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["corrected_transcript_id"], ["corrected_transcripts.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_stt_correction_logs_corrected_transcript_id", "stt_correction_logs", ["corrected_transcript_id"])
+    op.create_index(
+        "ix_stt_correction_logs_corrected_transcript_id", "stt_correction_logs", ["corrected_transcript_id"]
+    )
 
 
 def downgrade() -> None:

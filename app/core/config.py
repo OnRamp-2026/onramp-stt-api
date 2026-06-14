@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     clova_backoff_max_sec: float = Field(default=60, ge=0)
     clova_semaphore_lease_sec: int = Field(default=240, ge=1)
     clova_chunk_lease_sec: int = Field(default=600, ge=1)
+    stt_max_retry_count: int = Field(default=3, ge=0)
 
     redis_stream_block_ms: int = Field(default=5000, ge=1)
     redis_stream_read_count: int = Field(default=10, ge=1)

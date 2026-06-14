@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 from dataclasses import asdict
 from typing import Any
 
@@ -13,6 +14,8 @@ from .rule_based_corrector import RuleBasedCorrector
 from .terms.term_dictionary import DomainTerm, JsonTermRepository, TermDictionary
 from .types import CorrectedSegment, CorrectionAuditLog, CorrectionResult, ReviewCandidate
 from .validators import choose_validated_output
+
+logger = logging.getLogger(__name__)
 
 
 class CorrectionService:
@@ -51,14 +54,17 @@ class CorrectionService:
             if client is None and self.settings.openai_api_key:
                 client = OpenAiLlmClient(self.settings)
             if client is not None:
-                candidate_text = client.complete(prompt)
-                final_text, llm_applied = choose_validated_output(
-                    raw_text=raw_text,
-                    fallback_text=first_pass_text,
-                    candidate_text=candidate_text,
-                    protected_terms=rule_result["protected_terms"],
-                    min_ratio=self.settings.stt_correction_min_response_ratio,
-                )
+                try:
+                    candidate_text = client.complete(prompt)
+                    final_text, llm_applied = choose_validated_output(
+                        raw_text=raw_text,
+                        fallback_text=first_pass_text,
+                        candidate_text=candidate_text,
+                        protected_terms=rule_result["protected_terms"],
+                        min_ratio=self.settings.stt_correction_min_response_ratio,
+                    )
+                except Exception:
+                    logger.warning("STT correction LLM failed; using rule-based result.", exc_info=True)
 
         corrected_segments = self._build_corrected_segments(raw_segments, final_text)
         correction_logs = self._build_correction_logs(
@@ -86,7 +92,9 @@ class CorrectionService:
             llm_applied=llm_applied,
         )
 
-    def _build_corrected_segments(self, raw_segments: list[dict[str, Any]], corrected_text: str) -> list[CorrectedSegment]:
+    def _build_corrected_segments(
+        self, raw_segments: list[dict[str, Any]], corrected_text: str
+    ) -> list[CorrectedSegment]:
         corrected_lines = corrected_text.splitlines()
         if len(corrected_lines) != len(raw_segments):
             corrected_lines = [str(segment.get("text") or "") for segment in raw_segments]
@@ -119,7 +127,9 @@ class CorrectionService:
                 continue
             raw_segment = raw_segments[segment_index]
             original_text = str(raw_segment.get("text") or "")
-            corrected_segment_text = corrected_lines[segment_index] if segment_index < len(corrected_lines) else original_text
+            corrected_segment_text = (
+                corrected_lines[segment_index] if segment_index < len(corrected_lines) else original_text
+            )
             term = term_by_id(self.term_dictionary, str(log["term_id"]))
             context_evidence = _context_evidence(raw_segments, segment_index, term)
             if log["action"] == "candidate":

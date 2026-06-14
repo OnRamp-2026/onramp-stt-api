@@ -69,6 +69,7 @@ class TranscriptionJob(Base):
     merged_segments_json: Mapped[list[dict[str, Any]] | None] = mapped_column(JSON)
     last_progress_ratio: Mapped[float] = mapped_column(Float, default=0.0)
     last_progress_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    correction_retry_count: Mapped[int] = mapped_column(Integer, default=0)
     error_code: Mapped[str | None] = mapped_column(String(128))
     error_message: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

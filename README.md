@@ -140,6 +140,7 @@ worker 역할:
 | `STT_VAD_MAX_CHUNK_SECONDS` | `55` | 내부 청크 상한 |
 | `CLOVA_MAX_CONCURRENT_JOBS` | `2` | 전체 worker 전역 동시 요청 수 |
 | `CLOVA_MAX_RETRY_COUNT` | `3` | retryable 오류 재시도 횟수 |
+| `STT_MAX_RETRY_COUNT` | `3` | correction 단계 retryable 오류 재시도 횟수 |
 | `CLOVA_CHUNK_LEASE_SEC` | `600` | 중단된 processing 청크 재점유 대기 시간 |
 | `REDIS_PENDING_RECLAIM_IDLE_MS` | `300000` | 중단된 Redis 메시지 회수 기준 |
 

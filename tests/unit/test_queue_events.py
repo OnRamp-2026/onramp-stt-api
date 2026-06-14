@@ -4,8 +4,8 @@ from uuid import uuid4
 from app.queue.events import (
     ProgressUpdated,
     StreamEnvelope,
-    TranscriptionCompleted,
     TranscriptCompleted,
+    TranscriptionCompleted,
     TranscriptionRequested,
     decode_envelope,
     encode_envelope,

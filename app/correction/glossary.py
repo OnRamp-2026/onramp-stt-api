@@ -42,15 +42,21 @@ def build_glossary_entries(
 
     entries: list[GlossaryEntry] = []
     for term_id in selected_ids[:max_items]:
-        term = terms_by_id.get(term_id)
-        if term is None:
+        selected_term = terms_by_id.get(term_id)
+        if selected_term is None:
             continue
         variants = []
-        for phrase in [*term.aliases, *term.stt_variants]:
+        for phrase in [*selected_term.aliases, *selected_term.stt_variants]:
             normalized = phrase.strip()
             if normalized and normalized not in variants:
                 variants.append(normalized)
-        entries.append(GlossaryEntry(term_id=term.term_id, canonical=term.canonical, variants=tuple(variants[:8])))
+        entries.append(
+            GlossaryEntry(
+                term_id=selected_term.term_id,
+                canonical=selected_term.canonical,
+                variants=tuple(variants[:8]),
+            )
+        )
     return entries
 
 
@@ -58,8 +64,7 @@ def render_glossary(entries: list[GlossaryEntry]) -> str:
     if not entries:
         return "- 없음"
     return "\n".join(
-        f"- {entry.canonical} | variants: {', '.join(entry.variants) if entry.variants else '-'}"
-        for entry in entries
+        f"- {entry.canonical} | variants: {', '.join(entry.variants) if entry.variants else '-'}" for entry in entries
     )
 
 
