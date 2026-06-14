@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import tempfile
 import uuid
-from dataclasses import asdict
 from pathlib import Path
 
 import structlog
@@ -11,6 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.core.config import Settings
+from app.core.exceptions import SttError
 from app.correction.service import (
     CorrectionService,
     serialize_corrected_segments,
@@ -18,8 +18,15 @@ from app.correction.service import (
     serialize_review_candidates,
 )
 from app.db.models import CorrectedTranscript, EventOutbox, JobStatus, SttCorrectionLog, TranscriptionJob, utcnow
-from app.queue.constants import COMPLETED_EVENT_TYPE, CORRECTION_WORKER_GROUP, STT_COMPLETED_STREAM
-from app.queue.events import StreamEnvelope, TranscriptCompleted, TranscriptionCompleted
+from app.queue.constants import (
+    COMPLETED_EVENT_TYPE,
+    CORRECTION_WORKER_GROUP,
+    PROGRESS_EVENT_TYPE,
+    STT_COMPLETED_STREAM,
+    STT_DLQ_STREAM,
+    STT_PROGRESS_STREAM,
+)
+from app.queue.events import ProgressUpdated, StreamEnvelope, TranscriptCompleted, TranscriptionCompleted
 from app.queue.inbox import is_processed, mark_processed
 from app.services.job_state import ensure_job_transition
 from app.storage.base import ObjectStorage
@@ -148,6 +155,66 @@ class CorrectionWorkerService:
         async with self.session_factory() as session:
             return await is_processed(session, CORRECTION_WORKER_GROUP, event_id)
 
+    async def record_failure(self, envelope: StreamEnvelope, error: Exception) -> bool:
+        payload = TranscriptCompleted.model_validate(envelope.payload)
+        async with self.session_factory() as session, session.begin():
+            if await is_processed(session, CORRECTION_WORKER_GROUP, envelope.event_id):
+                return True
+            job = await session.scalar(
+                select(TranscriptionJob).where(TranscriptionJob.id == payload.transcription_id).with_for_update()
+            )
+            if job is None:
+                raise RuntimeError("Transcription job not found while recording correction failure.")
+
+            job.correction_retry_count += 1
+            job.error_code = _error_code(error)
+            job.error_message = str(error)[:2000]
+            retryable = isinstance(error, SttError) and error.retryable
+            if retryable and job.correction_retry_count <= self.settings.stt_max_retry_count:
+                return False
+
+            ensure_job_transition(job.status, JobStatus.failed)
+            job.status = JobStatus.failed
+            occurred_at = utcnow()
+            progress_ratio = job.completed_chunks / job.total_chunks if job.total_chunks else 0.0
+            session.add_all(
+                [
+                    EventOutbox(
+                        id=f"evt_{uuid.uuid4().hex}",
+                        aggregate_type="transcription",
+                        aggregate_id=str(job.id),
+                        event_type=PROGRESS_EVENT_TYPE,
+                        stream_name=STT_PROGRESS_STREAM,
+                        payload_json=ProgressUpdated(
+                            transcription_id=job.id,
+                            tenant_id=job.tenant_id,
+                            status=JobStatus.failed.value,
+                            completed_chunks=job.completed_chunks,
+                            total_chunks=job.total_chunks,
+                            failed_chunks=job.failed_chunks,
+                            progress_ratio=progress_ratio,
+                            occurred_at=occurred_at,
+                        ).model_dump(mode="json"),
+                    ),
+                    EventOutbox(
+                        id=f"evt_{uuid.uuid4().hex}",
+                        aggregate_type="transcription",
+                        aggregate_id=str(job.id),
+                        event_type="transcription.correction.failed",
+                        stream_name=STT_DLQ_STREAM,
+                        payload_json={
+                            "transcription_id": str(job.id),
+                            "tenant_id": job.tenant_id,
+                            "stage": "correction",
+                            "retry_count": job.correction_retry_count,
+                            "error_code": job.error_code,
+                        },
+                    ),
+                ]
+            )
+            mark_processed(session, CORRECTION_WORKER_GROUP, envelope.event_id, str(job.id))
+        return True
+
     async def _build_result(self, transcription_id: uuid.UUID):
         async with self.session_factory() as session:
             job = await session.get(TranscriptionJob, transcription_id)
@@ -178,3 +245,9 @@ class CorrectionWorkerService:
 
 def result_object_key(tenant_id: str, transcription_id: uuid.UUID) -> str:
     return f"tenants/{tenant_id}/transcriptions/{transcription_id}/result/corrected-transcript.json"
+
+
+def _error_code(error: Exception) -> str:
+    if isinstance(error, SttError):
+        return error.code
+    return type(error).__name__.lower()
